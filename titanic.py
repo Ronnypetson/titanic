@@ -75,21 +75,21 @@ w = tf.Variable(tf.random_normal([num_features,1],stddev=0.1))
 y = tf.nn.softmax(tf.matmul(X,w))
 y_ = tf.placeholder(tf.float32, [None,1])
 #
-cross_entropy = tf.reduce_mean((y_-y)*((y_-y)))
+cross_entropy = tf.reduce_mean(tf.abs(y-y_))
 			#tf.nn.softmax_cross_entropy_with_logits(labels=y_,logits=y)
 			#-y_*tf.log(y)-(1.0-y_)*tf.log(1.0-y))
-train_step = tf.train.GradientDescentOptimizer(0.1).minimize(cross_entropy)
+			#(y_-y)*(y_-y)
+train_step = tf.train.GradientDescentOptimizer(0.003).minimize(cross_entropy)
 #
 sess = tf.InteractiveSession()
 tf.global_variables_initializer().run()
 #
-num_epochs = 100
-bsize = 10
+num_epochs = 10000
+bsize = 20
 for i in range(num_epochs):
 	j = np.random.randint(0,num_samples-bsize)
-	#batch_xs, batch_ys = tf.train.shuffle_batch([train_data,labels,bsize,num_threads=4,capacity=50000,min_after_dequeue=10000)
 	batch_xs, batch_ys = [train_data[j:j+bsize],labels[j:j+bsize]]
 	sess.run(train_step, feed_dict={X:batch_xs, y_:batch_ys})
-print(sess.run(cross_entropy, feed_dict={X:train_data, y_:labels}))
+	print(sess.run(cross_entropy, feed_dict={X:batch_xs, y_:batch_ys}))
 #
 
